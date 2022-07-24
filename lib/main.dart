@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_app/question.dart';
 
 //The main function is the starting point of our app.
 void main() {
@@ -46,70 +47,118 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  //The buttonBuilder function builds out our True and false buttons.
-  //It takes in the buttonText and buttonColor as inputs.
-  Expanded buttonBuilder(
-      {required String buttonText, required Color buttonColor}) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: TextButton(
-          style: TextButton.styleFrom(
-            primary: Colors.white,
-            backgroundColor: buttonColor,
-          ),
-          onPressed: () {},
-          child: Text(
-            buttonText,
-            style: const TextStyle(
-              fontSize: 25.0,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-  // The iconBuilder builds our icons which are going to indicate
-  //  our quiz score as we start answering the quizzes.
-  //It takes in the iconName and iconColor as inputs.
-  Icon iconBuilder({required IconData iconName, required Color iconColor}){
-    return Icon(
-      iconName,
-      color: iconColor,
-      size: 25.0,
-    );
-  }
+  //The scoreKeeper list keeps a list of the scores on our app.
+  //It has a static data type of icons.
+  List<Icon> scoreKeeper = [];
+  //The questionBank would hold all of our questions and associate them with their
+  //answers in a list.
+  List<Questions> questionBank = [
+    Questions(q: 'You can lead a cow down the stairs but not up the stairs', a: false),
+    Questions(q: 'Approximately one quarter of the human bones are in the feet', a: true),
+    Questions(q: 'A slug\'s blood is green', a: true),
+  ];
+  //The question number is a variable that keeps track of our questions displayed.
+  int questionNumber = 0;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Expanded(
-          flex: 4,
-          child: Align(
-            alignment: Alignment.center,
-            child: Text(
-              'This is where the quiz questions would go.',
-              style: TextStyle(
-                fontSize: 20.0,
+        Expanded(
+          flex: 5,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                //This displays our questions from the list questions on the index
+                //number in the questionNumber variable.
+                questionBank[questionNumber].questionText,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20.0,
+                ),
               ),
             ),
           ),
         ),
-        buttonBuilder(buttonText: 'True', buttonColor: Colors.green),
-        buttonBuilder(buttonText: 'False', buttonColor: Colors.red),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.green,
+              ),
+              //The user picked true when this button is clicked.
+              onPressed: () {
+                //The variable correctAnswer checks for the correct answer when picked
+                //by the user
+                bool correctAnswer = questionBank[questionNumber].questionAnswer;
+                //The condition checks if the selected answer is true or false.
+                if(correctAnswer == true){
+                  print('The answer is right');
+                }else{
+                  print('The answer is wrong');
+                }
+                setState(() {
+                  questionNumber++;
+                  scoreKeeper.add(const Icon(
+                    Icons.done,
+                    color: Colors.green,
+                    size: 25.0,
+                  ));
+                });
+              },
+              child: const Text(
+                'True',
+                style: TextStyle(
+                  fontSize: 25.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.red,
+              ),
+              //The user picked false when this button is clicked.
+              onPressed: () {
+                //The variable correctAnswer checks for the correct answer when picked
+                //by the user
+                bool correctAnswer = questionBank[questionNumber].questionAnswer;
+                //The condition checks if the selected answer is true or false.
+                if(correctAnswer == false){
+                  print('The answer is right');
+                }else{
+                  print('The answer is wrong');
+                }
+                setState(() {
+                  questionNumber++;
+                  scoreKeeper.add(const Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 25.0,
+                  ));
+                });
+              },
+              child: const Text(
+                'False',
+                style: TextStyle(
+                  fontSize: 25.0,
+                ),
+              ),
+            ),
+          ),
+        ),
         Wrap(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: iconBuilder(iconName: Icons.done, iconColor: Colors.green),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: iconBuilder(iconName: Icons.close, iconColor: Colors.red),
-            ),
-          ],
+          //This wraps our scorekeeper icons.
+          children: scoreKeeper,
         ),
       ],
     );
