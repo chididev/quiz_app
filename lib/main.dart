@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_app/question.dart';
+import 'package:quiz_app/quizbrain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 //The main function is the starting point of our app.
 void main() {
@@ -50,15 +53,52 @@ class _QuizPageState extends State<QuizPage> {
   //The scoreKeeper list keeps a list of the scores on our app.
   //It has a static data type of icons.
   List<Icon> scoreKeeper = [];
-  //The questionBank would hold all of our questions and associate them with their
-  //answers in a list.
-  List<Questions> questionBank = [
-    Questions(q: 'You can lead a cow down the stairs but not up the stairs', a: false),
-    Questions(q: 'Approximately one quarter of the human bones are in the feet', a: true),
-    Questions(q: 'A slug\'s blood is green', a: true),
-  ];
-  //The question number is a variable that keeps track of our questions displayed.
-  int questionNumber = 0;
+
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = quizBrain.getAnswer();
+    setState(() {
+      if (quizBrain.isFinished() == true) {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: 'FINISHED',
+          desc: 'You\'ve reached the end of the quiz.',
+          buttons: [
+            DialogButton(
+              onPressed: () => Navigator.pop(context),
+              width: 200,
+              child: const Text(
+                'PLAY AGAIN',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+
+            )
+          ],
+        ).show();
+
+        quizBrain.reset();
+
+        scoreKeeper = [];
+      } else {
+        //The condition checks if the selected answer is true or false.
+        if (userPickedAnswer == correctAnswer) {
+          scoreKeeper.add(const Icon(
+            Icons.done,
+            color: Colors.green,
+            size: 25.0,
+          ));
+        } else {
+          scoreKeeper.add(const Icon(
+            Icons.close,
+            color: Colors.red,
+            size: 25.0,
+          ));
+        }
+
+        quizBrain.nextQuestion();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +113,7 @@ class _QuizPageState extends State<QuizPage> {
               child: Text(
                 //This displays our questions from the list questions on the index
                 //number in the questionNumber variable.
-                questionBank[questionNumber].questionText,
+                quizBrain.getQuestion(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 20.0,
@@ -92,23 +132,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               //The user picked true when this button is clicked.
               onPressed: () {
-                //The variable correctAnswer checks for the correct answer when picked
-                //by the user
-                bool correctAnswer = questionBank[questionNumber].questionAnswer;
-                //The condition checks if the selected answer is true or false.
-                if(correctAnswer == true){
-                  print('The answer is right');
-                }else{
-                  print('The answer is wrong');
-                }
-                setState(() {
-                  questionNumber++;
-                  scoreKeeper.add(const Icon(
-                    Icons.done,
-                    color: Colors.green,
-                    size: 25.0,
-                  ));
-                });
+                checkAnswer(true);
               },
               child: const Text(
                 'True',
@@ -129,23 +153,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               //The user picked false when this button is clicked.
               onPressed: () {
-                //The variable correctAnswer checks for the correct answer when picked
-                //by the user
-                bool correctAnswer = questionBank[questionNumber].questionAnswer;
-                //The condition checks if the selected answer is true or false.
-                if(correctAnswer == false){
-                  print('The answer is right');
-                }else{
-                  print('The answer is wrong');
-                }
-                setState(() {
-                  questionNumber++;
-                  scoreKeeper.add(const Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 25.0,
-                  ));
-                });
+                checkAnswer(false);
               },
               child: const Text(
                 'False',
